@@ -13,6 +13,10 @@ parser = optparse.OptionParser()
                   #action="store_true",
                   #default="false",
                   #help="Print fetcher results")
+parser.add_option("-i", "--id",
+                  dest = "id",
+                  help="id of the movie, helpful!",
+                  metavar="ID")
 #parser.add_option("-f", "--file",               #the long and short option
                     #dest="filename",            #name in the options dict
                     #help="write report to FILE",#help text for --help
@@ -35,7 +39,7 @@ parser = optparse.OptionParser()
 
 (options, args) = parser.parse_args()
 
-def get_data(id, field=None):
+def getData(id, field=None):
   """Gets IMDB data (field if field mentioned) by doing a simple HTTP query.
   A hack from http://ubuntuincident.wordpress.com/2012/02/12/get-imdb-ratings-without-any-scraping/
   """
@@ -47,38 +51,43 @@ def get_data(id, field=None):
   else:
     return result['data']
  
-#q will store the query movie name
-q = "+".join(args)
 
-#right now, we will just pass the movie name to the query
-request = urllib2.Request("http://imdb.com/xml/find?json=1&s=tt&q="+q)
+def findMovie(name):
+  #right now, we will just pass the movie name to the query
+  request = urllib2.Request("http://imdb.com/xml/find?json=1&s=tt&q="+name)
 
-#get the request
-handler = urllib2.urlopen(request)
+  #get the request
+  handler = urllib2.urlopen(request)
 
-#parse the text as json
-result = json.loads(handler.read())
+  #parse the text as json
+  result = json.loads(handler.read())
 
-#try to understand the results:
-categories = [ ["title_popular", "Popular Titles"],
-              ["title_exact", "Exact Titles"],
-              ]
+  #try to understand the results:
+  categories = [ ["title_popular", "Popular Titles"],
+                ["title_exact", "Exact Titles"],
+                ]
 
-#add options to make approx results optional
-if True:
-  categories.append(["title_approx", "Approx Titles"])
+  #add options to make approx results optional
+  if True:
+    categories.append(["title_approx", "Approx Titles"])
 
+  #Application:
+  if 'title_popular' in result.keys() and len(result['title_popular']) == 1:
+    return result['title_popular'][0]['id']
 
-#Application:
+  else:
+    for k, n in categories:
+      if k in result.keys():
+        print n+":"
+        for item in result[k]:
+          print " %s: %s (%s)"%(item['id'], item['title'], item['description'])
+  return None
 
-if 'title_popular' in result.keys():
-  print get_data(result['title_popular'][0]['id'], 'rating')
-
+if options.id:
+  print getData(options.id, 'rating')
 else:
-  for k, n in categories:
-    if k in result.keys():
-      print n+":"
-      for item in result[k]:
-        print " Title:", item['title']
-        print " Description:", item['description']
-        print " Id:", item['id']
+  #q will store the query movie name
+  q = "+".join(args)
+  movie = findMovie(q)
+  if movie:
+    print getData(movie, 'rating')
