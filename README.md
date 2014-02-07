@@ -33,8 +33,6 @@ How to use:
     #search with id
     $ python heyimdb.py -i tt0111161
     [u'The Shawshank Redemption', 9.3] 
-   
-
 
 TODO:
  - to add options (currently added, but options dont work)
