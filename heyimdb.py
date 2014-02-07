@@ -63,7 +63,9 @@ result = json.loads(handler.read())
 categories = [ ["title_popular", "Popular Titles"],
               ["title_exact", "Exact Titles"],
               ]
-if False:
+
+#add options to make approx results optional
+if True:
   categories.append(["title_approx", "Approx Titles"])
 
 
@@ -80,5 +82,3 @@ else:
         print " Title:", item['title']
         print " Description:", item['description']
         print " Id:", item['id']
-
-
