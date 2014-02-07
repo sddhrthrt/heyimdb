@@ -39,18 +39,20 @@ parser.add_option("-i", "--id",
 
 (options, args) = parser.parse_args()
 
-def getData(id, field=None):
-  """Gets IMDB data (field if field mentioned) by doing a simple HTTP query.
+def getData(id, fields=None):
+  """Gets IMDB data (fields if fields mentioned) by doing a simple HTTP query.
   A hack from http://ubuntuincident.wordpress.com/2012/02/12/get-imdb-ratings-without-any-scraping/
   """
   req = urllib2.Request("http://app.imdb.com/title/maindetails?tconst="+id)
   handler = urllib2.urlopen(req)
   result = json.loads(handler.read())
-  if field:
-    return result['data'][field]
+  if fields:
+    if isinstance(fields, (list, tuple)):
+      return [ result['data'][field] for field in fields ]
+    else:
+      return result['data'][fields]
   else:
     return result['data']
- 
 
 def findMovie(name):
   #right now, we will just pass the movie name to the query
@@ -84,7 +86,7 @@ def findMovie(name):
   return None
 
 if options.id:
-  print getData(options.id, 'rating')
+  print getData(options.id, ['title', 'rating'])
 else:
   #q will store the query movie name
   q = "+".join(args)
