@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import optparse
 import urllib2
 import json
@@ -17,6 +19,11 @@ parser.add_option("-i", "--id",
                   dest = "id",
                   help="id of the movie, helpful!",
                   metavar="ID")
+parser.add_option("-v", "--verbose",
+                  dest="verbose",
+                  action="store_true",
+                  help="verbose")
+
 #parser.add_option("-f", "--file",               #the long and short option
                     #dest="filename",            #name in the options dict
                     #help="write report to FILE",#help text for --help
@@ -92,4 +99,6 @@ else:
   q = "+".join(args)
   movie = findMovie(q)
   if movie:
+    if options.verbose:
+      print "Found: %s"%movie
     print getData(movie, 'rating')
